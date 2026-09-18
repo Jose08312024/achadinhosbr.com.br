@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Achadinhos BR</title>
+<style>
+body{margin:0;background:#090909;color:#fff;font-family:Arial,sans-serif}header{padding:12px 5%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #292929;position:sticky;top:0;background:#090909}.brand{display:flex;gap:10px;align-items:center}.brand img{width:55px;height:55px;border-radius:50%;object-fit:cover}.brand h1{margin:0}.brand p{margin:3px 0;color:#aaa;font-size:12px}button,a{border:0;border-radius:10px;padding:11px 14px;font-weight:bold;text-decoration:none;cursor:pointer}button{background:#ff7a00}.adm{background:#222;color:#fff}.hero{width:88%;max-width:1100px;margin:25px auto;padding:28px;border:1px solid #40230f;border-radius:20px;background:#18110c}.hero h2{font-size:40px;margin:10px 0}.hero img{width:120px;border-radius:50%;float:right}.wrap{width:88%;max-width:1100px;margin:auto}.head{display:flex;justify-content:space-between;gap:12px;align-items:center}input,textarea{width:100%;box-sizing:border-box;background:#111;color:#fff;border:1px solid #444;border-radius:9px;padding:11px;margin:5px 0 12px}.head input{max-width:300px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}.card{background:#171717;border:1px solid #292929;border-radius:15px;overflow:hidden}.card img{width:100%;aspect-ratio:1;object-fit:cover}.body{padding:14px}.price{font-size:20px;font-weight:bold}.buy{display:block;text-align:center;background:#ff7a00;color:#111;margin-top:12px}.panel{background:#151515;border:1px solid #333;border-radius:15px;padding:20px;margin:20px 0}.hidden{display:none}.msg{color:#ffae5c;margin:8px 0}.item{display:flex;gap:10px;align-items:center;border-top:1px solid #333;padding:10px 0}.item img{width:55px;height:55px;object-fit:cover;border-radius:8px}.item div{flex:1}.del{background:#7d2020;color:#fff}.edit{background:#333;color:#fff}footer{text-align:center;color:#777;padding:30px}
+@media(max-width:600px){.hero h2{font-size:28px}.hero img{width:75px}.head{display:block}.head input{max-width:none}}
+</style>
+</head>
+<body>
+<header><div class="brand"><img src="logo.png"><div><h1>Achadinhos BR</h1><p>Produtos • Ofertas • Achadinhos</p></div></div><button class="adm" onclick="openAdm()">ADM</button></header>
+<section class="hero wrap"><img src="logo.png"><small>🛍️ OFERTAS DA SHOPEE</small><h2>Os melhores produtos com os menores preços!</h2><p>Achadinhos selecionados para você.</p></section>
+<main class="wrap"><div class="head"><h2>🔥 Achadinhos</h2><input id="search" placeholder="Pesquisar produto..." oninput="render()"></div><div id="products" class="grid"></div>
+<section id="admin" class="panel hidden"><h2>🔐 Painel ADM</h2><div id="login"><input id="pass" type="password" placeholder="Senha"><button onclick="login()">Entrar</button><div id="msg" class="msg"></div></div>
+<div id="dash" class="hidden"><button onclick="logout()">Sair</button><hr><h3>Adicionar / editar produto</h3>
+<input id="id" type="hidden"><input id="name" placeholder="Nome do produto"><input id="price" placeholder="Preço (ex.: R$ 29,90)"><input id="cat" placeholder="Categoria" value="Ofertas"><input id="link" placeholder="Link de afiliado da Shopee"><input id="img" placeholder="URL da foto do produto"><textarea id="desc" placeholder="Descrição"></textarea><button onclick="save()">Salvar produto</button> <button class="edit" onclick="clearForm()">Limpar</button><div id="list"></div></div></section></main>
+<footer>© Achadinhos BR • Links de afiliado podem gerar comissão.</footer>
+<script>
+const PASSWORD="otavioryszaneanny";
+let products=JSON.parse(localStorage.getItem("achadinhos")||"[]");
+function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function render(){let q=(document.getElementById("search").value||"").toLowerCase();let a=products.filter(p=>(p.name+" "+p.desc+" "+p.cat).toLowerCase().includes(q));document.getElementById("products").innerHTML=a.length?a.map(p=>`<article class="card">${p.img?`<img src="${esc(p.img)}">`:""}<div class="body"><small>${esc(p.cat)}</small><h3>${esc(p.name)}</h3><div class="price">${esc(p.price)}</div><p>${esc(p.desc)}</p><a class="buy" href="${esc(p.link)}" target="_blank" rel="noopener">Ver oferta na Shopee →</a></div></article>`).join(""):"<p>Nenhum produto cadastrado ainda.</p>"}
+function openAdm(){document.getElementById("admin").classList.toggle("hidden")}
+function login(){if(document.getElementById("pass").value===PASSWORD){document.getElementById("login").classList.add("hidden");document.getElementById("dash").classList.remove("hidden");renderAdmin()}else document.getElementById("msg").textContent="Senha incorreta."}
+function logout(){document.getElementById("login").classList.remove("hidden");document.getElementById("dash").classList.add("hidden");document.getElementById("pass").value=""}
+function save(){let p={id:document.getElementById("id").value||Date.now(),name:document.getElementById("name").value,price:document.getElementById("price").value,cat:document.getElementById("cat").value||"Ofertas",link:document.getElementById("link").value,img:document.getElementById("img").value,desc:document.getElementById("desc").value};if(!p.name||!p.link)return alert("Preencha nome e link da Shopee.");let i=products.findIndex(x=>String(x.id)===String(p.id));if(i>=0)products[i]=p;else products.unshift(p);localStorage.setItem("achadinhos",JSON.stringify(products));clearForm();render();renderAdmin()}
+function clearForm(){["id","name","price","link","img","desc"].forEach(x=>document.getElementById(x).value="");document.getElementById("cat").value="Ofertas"}
+function renderAdmin(){document.getElementById("list").innerHTML=products.map(p=>`<div class="item">${p.img?`<img src="${esc(p.img)}">`:""}<div><b>${esc(p.name)}</b><br><small>${esc(p.price)}</small></div><button class="edit" onclick="edit(${p.id})">Editar</button><button class="del" onclick="del(${p.id})">Excluir</button></div>`).join("")}
+function edit(id){let p=products.find(x=>String(x.id)===String(id));["id","name","price","cat","link","img","desc"].forEach(x=>document.getElementById(x).value=p[x]||"")}
+function del(id){if(confirm("Excluir produto?")){products=products.filter(p=>String(p.id)!==String(id));localStorage.setItem("achadinhos",JSON.stringify(products));render();renderAdmin()}}
+render();
+</script></body></html>
